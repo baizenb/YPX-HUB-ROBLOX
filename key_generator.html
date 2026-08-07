@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YPX HUB - 今日密钥</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: #0a0b10;
+    color: #fff;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .card {
+    background: #10131c;
+    border: 2px solid #00f0ff;
+    border-radius: 16px;
+    padding: 30px 24px;
+    max-width: 380px;
+    width: 100%;
+    text-align: center;
+  }
+  .title { color: #00f0ff; font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+  .sub { color: #7888a0; font-size: 12px; margin-bottom: 24px; }
+  .key-box {
+    background: rgba(0,240,255,0.08);
+    border: 2px dashed #00f0ff;
+    border-radius: 12px;
+    padding: 20px;
+    cursor: pointer;
+    margin-bottom: 12px;
+  }
+  .key-label { color: #7888a0; font-size: 11px; margin-bottom: 6px; }
+  .key-value { color: #00f0ff; font-size: 26px; font-weight: 800; font-family: "Courier New", monospace; letter-spacing: 2px; }
+  .hint { color: #00f0ff; font-size: 11px; margin-top: 4px; opacity: 0.7; }
+  .copied { color: #28c840; font-size: 13px; font-weight: 600; margin-top: 6px; display: none; }
+  .date { color: #505868; font-size: 12px; margin-bottom: 20px; }
+  .info { background: rgba(255,255,255,0.03); border-radius: 10px; padding: 14px 16px; text-align: left; }
+  .info p { color: #8898b0; font-size: 11px; line-height: 1.7; }
+  .info span { color: #00f0ff; font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="title">⚡ YPX HUB</div>
+  <div class="sub">今日密钥 · 每日自动更新</div>
+  <div class="key-box" onclick="copyKey()">
+    <div class="key-label">今日卡密</div>
+    <div class="key-value" id="keyDisplay">计算中...</div>
+    <div class="hint">👆 点击复制</div>
+  </div>
+  <div class="copied" id="copiedMsg">✅ 已复制！</div>
+  <div class="date" id="dateDisplay"></div>
+  <div class="info">
+    <p><span>📋 使用说明：</span></p>
+    <p>① 点击上方密钥框复制卡密</p>
+    <p>② 回到 Roblox 游戏</p>
+    <p>③ 在 YPX HUB 验证窗口粘贴</p>
+    <p>④ 点击「验证并启动」进入</p>
+  </div>
+</div>
+<script>
+var chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789";
+var today = new Date();
+var dateStr = today.getFullYear() + "-" + String(today.getMonth()+1).padStart(2,"0") + "-" + String(today.getDate()).padStart(2,"0");
+var input = dateStr + "YPX2026SecretX9mK";
+function simpleHash(str) {
+  var h = 0;
+  for (var i = 0; i < str.length; i++) {
+    h = (h * 31 + str.charCodeAt(i)) % 2147483647;
+  }
+  return h;
+}
+var hash = simpleHash(input);
+var key = "YPX-";
+for (var i = 0; i < 8; i++) {
+  var idx = hash % chars.length;
+  key += chars[idx];
+  hash = Math.floor(hash / chars.length);
+  if (hash <= 0) hash = simpleHash(input + (i+1));
+}
+document.getElementById("keyDisplay").textContent = key;
+document.getElementById("dateDisplay").textContent = "📅 " + dateStr + "（北京时间每日0点）";
+function copyKey() {
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(key).then(function() {
+      var m = document.getElementById("copiedMsg");
+      m.style.display = "block";
+      setTimeout(function() { m.style.display = "none"; }, 2000);
+    });
+  } else {
+    var ta = document.createElement("textarea");
+    ta.value = key;
+    ta.style.position = "fixed";
+    ta.style.opacity = "0";
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand("copy");
+    document.body.removeChild(ta);
+    var m = document.getElementById("copiedMsg");
+    m.style.display = "block";
+    setTimeout(function() { m.style.display = "none"; }, 2000);
+  }
+}
+</script>
+</body>
+</html>
